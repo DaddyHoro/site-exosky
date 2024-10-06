@@ -25,7 +25,7 @@ function toggleMenu(){
 }
 
 // Path to your CSV file
-const csvFilePath = './planet_data.csv';
+const csvFilePath = "./planet_data.csv";
 
 // Function to load and parse the CSV
 async function loadCSV() {
@@ -36,7 +36,8 @@ async function loadCSV() {
     return Papa.parse(csvData, {
         header: false, // Assuming your CSV doesn't have a header
         skipEmptyLines: true // Skip empty lines
-    }).data;   
+    }).data;  
+    console.log(bigData.length) ;
 }
 
 // Function to search for the term in the second column
@@ -82,8 +83,9 @@ function displayResults(results) {
         hostNameCell.textContent = hostName;
         rowElement.appendChild(hostNameCell);
         
-        const rowLink = document.createElement('a');
-        
+        rowElement.onclick = () => {
+            sendString(plName);
+        };
 
         table.appendChild(rowElement);
     });
@@ -91,4 +93,20 @@ function displayResults(results) {
     resultsDiv.appendChild(table);
 }
 
-
+function sendString(inputString) {
+    
+    fetch('http://127.0.0.1:5000/process', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ inputString: inputString }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Processed string from Python:', data.result);
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+}
